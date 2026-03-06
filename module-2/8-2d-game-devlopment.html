@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<canvas id="game" width="500" height="300" style="border:1px solid black;"></canvas>
+
+<script>
+let canvas = document.getElementById("game");
+let ctx = canvas.getContext("2d");
+
+let player = {x:50,y:150,r:15};
+let obstacle = {x:500,y:140,w:20,h:40};
+
+document.addEventListener("keydown", e=>{
+ if(e.key=="ArrowUp") player.y -= 20;
+ if(e.key=="ArrowDown") player.y += 20;
+});
+
+function game(){
+ ctx.clearRect(0,0,canvas.width,canvas.height);
+
+ ctx.beginPath();
+ ctx.arc(player.x,player.y,player.r,0,Math.PI*2);
+ ctx.fillStyle="blue";
+ ctx.fill();
+
+ ctx.fillStyle="red";
+ ctx.fillRect(obstacle.x,obstacle.y,obstacle.w,obstacle.h);
+
+ obstacle.x -= 3;
+ if(obstacle.x < 0) obstacle.x = canvas.width;
+
+ if(player.x + player.r > obstacle.x &&
+    player.x - player.r < obstacle.x + obstacle.w &&
+    player.y + player.r > obstacle.y &&
+    player.y - player.r < obstacle.y + obstacle.h){
+        alert("Game Over");
+        obstacle.x = canvas.width;
+ }
+
+ requestAnimationFrame(game);
+}
+
+game();
+</script>
+
+</body>
+</html>   

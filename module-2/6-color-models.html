@@ -1,0 +1,33 @@
+<!-- 6. Color Models
+
+Objective: Experiment with RGB and HSI color models
+Tool: HTML + JavaScript -->
+<!DOCTYPE html>
+<html>
+<body>
+
+<h3>RGB Color Model</h3>
+<input type="range" id="r" max="255">
+<input type="range" id="g" max="255">
+<input type="range" id="b" max="255">
+
+<div id="box" style="width:200px;height:200px;border:1px solid black;"></div>
+
+<script>
+let r=document.getElementById("r");
+let g=document.getElementById("g");
+let b=document.getElementById("b");
+let box=document.getElementById("box");
+
+function update(){
+ let color = `rgb(${r.value},${g.value},${b.value})`;
+ box.style.background=color;
+}
+
+r.oninput=update;
+g.oninput=update;
+b.oninput=update;
+</script>
+
+</body>
+</html>
