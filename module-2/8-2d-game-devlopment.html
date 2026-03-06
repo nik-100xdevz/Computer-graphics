@@ -1,48 +1,118 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <title>Simple 2D Game</title>
+    <style>
+        body { margin: 0; background: #222; overflow: hidden; }
+        canvas { background: white; display: block; margin: auto; }
+    </style>
+</head>
 <body>
 
-<canvas id="game" width="500" height="300" style="border:1px solid black;"></canvas>
+<canvas id="gameCanvas"></canvas>
 
 <script>
-let canvas = document.getElementById("game");
-let ctx = canvas.getContext("2d");
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
 
-let player = {x:50,y:150,r:15};
-let obstacle = {x:500,y:140,w:20,h:40};
+canvas.width = 600;
+canvas.height = 400;
 
-document.addEventListener("keydown", e=>{
- if(e.key=="ArrowUp") player.y -= 20;
- if(e.key=="ArrowDown") player.y += 20;
-});
+let player = {
+    x: 300,
+    y: 350,
+    radius: 15,
+    speed: 5
+};
 
-function game(){
- ctx.clearRect(0,0,canvas.width,canvas.height);
+let obstacles = [];
+let score = 0;
+let gameOver = false;
 
- ctx.beginPath();
- ctx.arc(player.x,player.y,player.r,0,Math.PI*2);
- ctx.fillStyle="blue";
- ctx.fill();
+// Keyboard control
+let keys = {};
+document.addEventListener("keydown", e => keys[e.key] = true);
+document.addEventListener("keyup", e => keys[e.key] = false);
 
- ctx.fillStyle="red";
- ctx.fillRect(obstacle.x,obstacle.y,obstacle.w,obstacle.h);
-
- obstacle.x -= 3;
- if(obstacle.x < 0) obstacle.x = canvas.width;
-
- if(player.x + player.r > obstacle.x &&
-    player.x - player.r < obstacle.x + obstacle.w &&
-    player.y + player.r > obstacle.y &&
-    player.y - player.r < obstacle.y + obstacle.h){
-        alert("Game Over");
-        obstacle.x = canvas.width;
- }
-
- requestAnimationFrame(game);
+// Create obstacle
+function createObstacle() {
+    obstacles.push({
+        x: Math.random() * 560,
+        y: 0,
+        width: 40,
+        height: 20,
+        speed: 3 + Math.random() * 2
+    });
 }
 
-game();
+// Collision detection
+function checkCollision(player, obs) {
+    return (
+        player.x + player.radius > obs.x &&
+        player.x - player.radius < obs.x + obs.width &&
+        player.y + player.radius > obs.y &&
+        player.y - player.radius < obs.y + obs.height
+    );
+}
+
+function drawPlayer() {
+    ctx.beginPath();
+    ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
+    ctx.fillStyle = "blue";
+    ctx.fill();
+}
+
+function drawObstacle(obs) {
+    ctx.fillStyle = "red";
+    ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+}
+
+function update() {
+    if (gameOver) {
+        ctx.fillStyle = "black";
+        ctx.font = "30px Arial";
+        ctx.fillText("Game Over! Score: " + score, 150, 200);
+        return;
+    }
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Player movement
+    if (keys["ArrowLeft"] && player.x > player.radius)
+        player.x -= player.speed;
+
+    if (keys["ArrowRight"] && player.x < canvas.width - player.radius)
+        player.x += player.speed;
+
+    drawPlayer();
+
+    // Obstacles
+    obstacles.forEach((obs, index) => {
+        obs.y += obs.speed;
+        drawObstacle(obs);
+
+        if (checkCollision(player, obs)) {
+            gameOver = true;
+        }
+
+        if (obs.y > canvas.height) {
+            obstacles.splice(index, 1);
+            score++;
+        }
+    });
+
+    ctx.fillStyle = "black";
+    ctx.font = "18px Arial";
+    ctx.fillText("Score: " + score, 10, 20);
+
+    requestAnimationFrame(update);
+}
+
+// Generate obstacles every 1 second
+setInterval(createObstacle, 1000);
+
+update();
 </script>
 
 </body>
-</html>   
+</html>
