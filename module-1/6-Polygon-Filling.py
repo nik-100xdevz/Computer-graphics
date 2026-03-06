@@ -6,19 +6,25 @@
 from PIL import Image
 
 def boundary_fill(x, y, fill_color, boundary_color, img):
-    current = img.getpixel((x, y))
-    
-    if current != boundary_color and current != fill_color:
-        img.putpixel((x, y), fill_color)
+    stack = [(x, y)]
 
-        boundary_fill(x+1, y, fill_color, boundary_color, img)
-        boundary_fill(x-1, y, fill_color, boundary_color, img)
-        boundary_fill(x, y+1, fill_color, boundary_color, img)
-        boundary_fill(x, y-1, fill_color, boundary_color, img)
+    while stack:
+        x, y = stack.pop()
+
+        current = img.getpixel((x, y))
+
+        if current != boundary_color and current != fill_color:
+            img.putpixel((x, y), fill_color)
+
+            stack.append((x+1, y))
+            stack.append((x-1, y))
+            stack.append((x, y+1))
+            stack.append((x, y-1))
+
 
 img = Image.new("RGB", (100,100), "white")
 
-# create simple boundary
+# Create boundary
 for i in range(20,80):
     img.putpixel((i,20),(0,0,0))
     img.putpixel((i,80),(0,0,0))
